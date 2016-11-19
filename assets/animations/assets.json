@@ -1,0 +1,52 @@
+{"frames": [
+
+{
+	"filename": "chic",
+	"frame": {"x":2,"y":2,"w":156,"h":156},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":156,"h":156},
+	"sourceSize": {"w":156,"h":156}
+},
+{
+	"filename": "cow",
+	"frame": {"x":160,"y":2,"w":156,"h":156},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":156,"h":156},
+	"sourceSize": {"w":156,"h":156}
+},
+{
+	"filename": "pig",
+	"frame": {"x":318,"y":82,"w":156,"h":156},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":156,"h":156},
+	"sourceSize": {"w":156,"h":156}
+},
+{
+	"filename": "spin",
+	"frame": {"x":2,"y":160,"w":179,"h":78},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":179,"h":78},
+	"sourceSize": {"w":179,"h":78}
+},
+{
+	"filename": "spin_down",
+	"frame": {"x":318,"y":2,"w":179,"h":78},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":179,"h":78},
+	"sourceSize": {"w":179,"h":78}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "assets.png",
+	"format": "RGBA8888",
+	"size": {"w":512,"h":256},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:3330729e0d25a6de866f941860c75334:2f858dec4bbcceecbf0867919119d11d:a759b6bbc8381ac9c472b28f589ad0d6$"
+}
+}
