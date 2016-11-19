@@ -55,10 +55,10 @@ export default class extends Phaser.State {
     const REEL_Y = 44;
 
     // add backing
-    const backing = this.addBacking(this.fullReelGrp, w + 5, h + REEL_Y + 5);
+    const backing = this.addBacking(this.fullReelGrp, w + 10, h + 10);
 
     const reelGrp = this.add.group(this.fullReelGrp, 'reel-group');
-    reelGrp.position.set(5, REEL_Y);
+    reelGrp.position.set(5, 5);
 
     this.reels = times(NUM_REELS).map((i) => (
       this.addReel(reelGrp, i * (TILE_WIDTH + SPACING), 0)
@@ -73,7 +73,7 @@ export default class extends Phaser.State {
 
     this.bottomBar = this.addBottomBar();
 
-    const padding = 80;
+    const padding = 50;
     const availableSpace = this.world.height - this.bottomBar.height - padding;
     const defaultSpace = TILE_HEIGHT * 3 + 20;
 
@@ -88,17 +88,21 @@ export default class extends Phaser.State {
   }
 
   addBottomBar() {
+    const grp = this.game.add.group();
+    grp.position.set(0, this.world.height - 60);
+
     // spin button
     this.spinBtn = this.addButton(
-      this.world,
+      grp,
       this.world.centerX,
-      this.world.height - 100,
+      0,
       'spin',
       () => {
         this.spin();
       }
     );
-    return this.spinBtn;
+    this.spinBtn.anchor.set(0.5);
+    return grp;
   }
 
   spin() {
