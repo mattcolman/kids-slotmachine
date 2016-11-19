@@ -1,20 +1,12 @@
 import Phaser from 'phaser';
 import times from 'lodash/times';
-import last from 'lodash/last';
-import sortBy from 'lodash/sortBy';
-import mapValues from 'lodash/mapValues';
 import random from 'lodash/random';
-import reduce from 'lodash/reduce';
-import shuffle from 'lodash/shuffle';
 import uniq from 'lodash/uniq';
 import 'gsap';
 import Reel from '../groups/Reel';
-import { decodePlayer, dollarize } from '../utils';
 import { TILE_WIDTH, TILE_HEIGHT, SPACING } from '../constants';
 import ValueTweener from '../ValueTweener';
 import Pool from '../pool';
-import * as Font from '../Font';
-import * as Color from '../Color';
 import { randomResults } from '../utils';
 
 const SPIN_DELAY = 0.2;
@@ -22,8 +14,6 @@ const {
   TweenMax,
   TimelineMax,
   Linear,
-  Strong,
-  PIXI,
 } = window;
 
 function isAWinner(results) {
@@ -33,7 +23,6 @@ function isAWinner(results) {
 export default class extends Phaser.State {
 
   create() {
-    console.log('SlotMachine States');
     this.valueTweener = new ValueTweener();
     this.pool = new Pool();
 
@@ -100,10 +89,15 @@ export default class extends Phaser.State {
 
   addBottomBar() {
     // spin button
-    this.spinBtn = this.addButton(this.world, this.world.centerX, this.world.height - 100, 'spin', () => {
-      console.log('spin');
-      this.spin();
-    });
+    this.spinBtn = this.addButton(
+      this.world,
+      this.world.centerX,
+      this.world.height - 100,
+      'spin',
+      () => {
+        this.spin();
+      }
+    );
     return this.spinBtn;
   }
 
@@ -170,7 +164,7 @@ export default class extends Phaser.State {
 
     btn.disable = () => {
       btn.inputEnabled = false;
-      btn.alpha = .2;
+      btn.alpha = 0.2;
     };
 
     btn.enable = () => {

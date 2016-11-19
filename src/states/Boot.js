@@ -32,7 +32,6 @@ const MANIFEST = {
 export default class extends Phaser.State {
 
   create() {
-    console.log('boot me up');
     const loader = this.game.plugins.add(ManifestLoader);
     loader.loadManifest(MANIFEST).then(() => {
       this.setupStage();

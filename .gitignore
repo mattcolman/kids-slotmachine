@@ -4,3 +4,4 @@ public/
 assets/working/
 *.fnt
 *.atlas/
+*.log
