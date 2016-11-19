@@ -11,6 +11,7 @@ const MANIFEST = {
     'spin',
     'select',
     'success',
+    'stop',
   ],
   animations: [
     'assets',

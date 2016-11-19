@@ -78,7 +78,7 @@ export default class Reel extends Phaser.Group {
     const tl = new TimelineMax({
       onComplete: () => {
         this.filters = null;
-        this.game.add.audio('select').play();
+        this.game.add.audio('stop').play();
         this.onComplete();
       },
     });

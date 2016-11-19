@@ -116,7 +116,7 @@ export default class extends Phaser.State {
 
   addBottomBar() {
     const grp = this.game.add.group();
-    grp.position.set(0, this.world.height - 60);
+    grp.position.set(0, this.world.height - 100);
 
     // spin button
     this.spinBtn = this.addButton(
@@ -128,7 +128,9 @@ export default class extends Phaser.State {
         this.spin();
       }
     );
-    this.spinBtn.anchor.set(0.5);
+    this.spinBtn.x -= this.spinBtn.width / 2;
+    console.log('spinBtn', this.spinBtn);
+    this.autoSparkle(this.spinBtn);
     return grp;
   }
 
@@ -157,28 +159,31 @@ export default class extends Phaser.State {
   }
 
   handleSpinsComplete(results) {
-    this.checkLinesForWin(results);
+    const grid = this.checkLinesForWin(results);
+    if (grid) this.animateLines(grid);
     this.spinSnd.stop();
     this.spinBtn.enable();
   }
 
   checkLinesForWin(results) {
     const filteredLines = LINES.filter((grid) => isAWinner(grid, results));
-    const finalGrid = mergeLines(filteredLines);
+    return mergeLines(filteredLines);
+  }
+
+  animateLines(grid) {
+    this.game.add.audio('success').play();
     let delay = 0;
-    if (finalGrid) {
-      this.reels.forEach((reel, i) => {
-        reel.part[1].cards.forEach((card, j) => {
-          const result = finalGrid[j][i];
-          if (result) {
-            card.glow(delay);
-            delay += 0.2;
-          } else {
-            card.gray();
-          }
-        });
+    this.reels.forEach((reel, i) => {
+      reel.part[1].cards.forEach((card, j) => {
+        const result = grid[j][i];
+        if (result) {
+          card.glow(delay);
+          delay += 0.2;
+        } else {
+          card.gray();
+        }
       });
-    }
+    });
   }
 
   /* -------------------------------------------------------
@@ -243,6 +248,7 @@ export default class extends Phaser.State {
       random(spacing, parent.width - spacing),
       random(spacing, parent.height - spacing)
     );
+    // p.position.set(spacing, spacing)
     p.scale.x = p.scale.y = 0;
     p.rotation = 0;
     const scale = random(0.8, 1.5);
