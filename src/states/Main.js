@@ -2,9 +2,16 @@ import Phaser from 'phaser';
 import times from 'lodash/times';
 import random from 'lodash/random';
 import uniq from 'lodash/uniq';
+import compact from 'lodash/compact';
+import flatMap from 'lodash/flatMap';
 import 'gsap';
 import Reel from '../groups/Reel';
-import { TILE_WIDTH, TILE_HEIGHT, SPACING } from '../constants';
+import {
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  SPACING,
+  LINES,
+} from '../constants';
 import ValueTweener from '../ValueTweener';
 import Pool from '../pool';
 import { randomResults } from '../utils';
@@ -16,8 +23,26 @@ const {
   Linear,
 } = window;
 
-function isAWinner(results) {
-  return uniq(results.map(r => r[1])).length === 1;
+function isAWinner(grid, results) {
+  const mapped = flatMap(grid, (line, i) => (
+    line.split('').map((value, j) => (
+      (value === 'X') ? results[j][i] : null
+    ))
+  ));
+  return uniq(compact(mapped)).length === 1;
+}
+
+function mergeLines(lines) {
+  if (lines.length === 0) return null;
+  const finalGrid = lines[0].map((line) => line.split('').map(() => false));
+  lines.forEach((grid) => (
+    grid.forEach((line, i) => (
+      line.split('').forEach((value, j) => (
+        finalGrid[i][j] = (value === 'X') ? true : finalGrid[i][j]
+      ))
+    ))
+  ));
+  return finalGrid;
 }
 
 export default class extends Phaser.State {
@@ -35,6 +60,8 @@ export default class extends Phaser.State {
     this.addSlots();
 
     super.create();
+
+    window.isAWinner = isAWinner;
   }
 
   shutdown() {
@@ -122,21 +149,36 @@ export default class extends Phaser.State {
     const promises = this.reels.map((reel, i) => (
       new Promise((resolve) => (
         TweenMax.delayedCall(i * SPIN_DELAY, () => {
-          reel.requestStop(results[i], () => {
-            if (isAWinner(results)) {
-              reel.glow();
-            }
-            resolve();
-          });
+          reel.requestStop(results[i], () => resolve());
         })
       ))
     ));
-    Promise.all(promises).then(() => this.handleSpinsComplete());
+    Promise.all(promises).then(() => this.handleSpinsComplete(results));
   }
 
-  handleSpinsComplete() {
+  handleSpinsComplete(results) {
+    this.checkLinesForWin(results);
     this.spinSnd.stop();
     this.spinBtn.enable();
+  }
+
+  checkLinesForWin(results) {
+    const filteredLines = LINES.filter((grid) => isAWinner(grid, results));
+    const finalGrid = mergeLines(filteredLines);
+    let delay = 0;
+    if (finalGrid) {
+      this.reels.forEach((reel, i) => {
+        reel.part[1].cards.forEach((card, j) => {
+          const result = finalGrid[j][i];
+          if (result) {
+            card.glow(delay);
+            delay += 0.2;
+          } else {
+            card.gray();
+          }
+        });
+      });
+    }
   }
 
   /* -------------------------------------------------------

@@ -1,8 +1,9 @@
 import times from 'lodash/times';
-import sample from 'lodash/sample';
-import shuffle from 'lodash/shuffle';
-import { transformise, dollarize } from '../utils';
-import { TILE_WIDTH, TILE_HEIGHT, SPACING, ANIMALS } from '../constants';
+import {
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  SPACING,
+} from '../constants';
 import '../filters/BlurY';
 import '../filters/Gray';
 import { randomLine } from '../utils';
@@ -26,16 +27,13 @@ export default class Reel extends Phaser.Group {
     this.blurY = game.add.filter('BlurY');
     this.grayFilter = game.add.filter('Gray');
     this.stopping = false;
-    this.overlay = this.addOverlay(this, 0, -this.maxHeight + TILE_WIDTH + SPACING);
+    // this.overlay = this.addOverlay(this, 0, -this.maxHeight + TILE_WIDTH + SPACING);
   }
 
   spin() {
     console.log('spin');
-    TweenMax.killTweensOf(this.overlay);
-    this.overlay.alpha = 1;
-    this.overlay.visible = false;
     this.part[1].cards.forEach((card) => {
-      card.filters = null;
+      card.reset();
     });
     TweenMax.killTweensOf(this);
     this.y = 0;
@@ -74,7 +72,7 @@ export default class Reel extends Phaser.Group {
     // oddly, you actually have to pause before you kill
     // to ensure there's not another tick after this.
     this.spinner.pause().kill();
-    this.setLine(this.part[1].cards.map(card => card.frameName), 0);
+    this.setLine(this.part[1].cards.map(card => card.getByName('sprite').frameName), 0);
     this.setLine(results);
 
     const tl = new TimelineMax({
@@ -90,21 +88,13 @@ export default class Reel extends Phaser.Group {
       .to(this.blurY, DURATION, { blur: 0, ease: Back.easeOut.config(1) }, 0);
   }
 
-  glow() {
-    this.part[1].cards[0].filters = [this.grayFilter];
-    this.part[1].cards[2].filters = [this.grayFilter];
-
-    this.overlay.visible = true;
-    TweenMax.to(this.overlay, 1, { alpha: 0, repeat: -1, yoyo: true });
-  }
-
   handleRepeat() {
     if (this.stopping) {
       this.stop(this.results);
       this.results = null;
       this.stopping = false;
     } else {
-      this.setLine(this.part[1].cards.map(card => card.frameName), 0);
+      this.setLine(this.part[1].cards.map(card => card.getByName('sprite').frameName), 0);
       this.setLine(randomLine(), 1);
     }
   }
@@ -152,12 +142,31 @@ export default class Reel extends Phaser.Group {
   }
 
   makeCard(parent) {
-    const sprite = this.game.add.sprite(0, 0, 'assets', null, parent);
+    const grp = this.game.add.group(parent);
+    const sprite = this.game.add.sprite(0, 0, 'assets', null, grp);
+    sprite.name = 'sprite';
 
-    sprite.setCard = (name) => {
+    grp.setCard = (name) => {
       sprite.frameName = name;
     };
 
-    return sprite;
+    const overlay = this.addOverlay(grp, 0, 0);
+    grp.glow = (delay = 0) => {
+      overlay.visible = true;
+      TweenMax.to(overlay, 1, { delay, alpha: 0, repeat: -1, yoyo: true });
+    };
+
+    grp.gray = () => {
+      grp.filters = [this.grayFilter];
+    };
+
+    grp.reset = () => {
+      grp.filters = null;
+      overlay.visible = false;
+      TweenMax.killTweensOf(overlay);
+      overlay.alpha = 1;
+    };
+
+    return grp;
   }
 }
