@@ -45,6 +45,14 @@ function mergeLines(lines) {
   return finalGrid;
 }
 
+function playSoundSequence(game, snds = []) {
+  if (snds.length === 0) return;
+  const snd = game.add.sound(snds.shift()).play();
+  snd.onStop.add(() => {
+    playSoundSequence(game, snds);
+  });
+}
+
 export default class extends Phaser.State {
 
   create() {
@@ -78,8 +86,6 @@ export default class extends Phaser.State {
     const NUM_REELS = 3;
     const w = (TILE_WIDTH + SPACING) * NUM_REELS;
     const h = (TILE_HEIGHT + SPACING) * 3 - SPACING;
-
-    const REEL_Y = 44;
 
     // add backing
     const backing = this.addBacking(this.fullReelGrp, w + 10, h + 10);
@@ -129,7 +135,6 @@ export default class extends Phaser.State {
       }
     );
     this.spinBtn.x -= this.spinBtn.width / 2;
-    console.log('spinBtn', this.spinBtn);
     this.autoSparkle(this.spinBtn);
     return grp;
   }
@@ -160,7 +165,17 @@ export default class extends Phaser.State {
 
   handleSpinsComplete(results) {
     const grid = this.checkLinesForWin(results);
-    if (grid) this.animateLines(grid);
+    if (grid) {
+      const winningAnimals = uniq(
+        flatMap(results, (line, i) => (
+          line.map((value, j) => ((grid[j][i]) ? value : null))
+        ))
+      );
+      TweenMax.delayedCall(2, () => {
+        playSoundSequence(this.game, winningAnimals);
+      });
+      this.animateLines(grid);
+    }
     this.spinSnd.stop();
     this.spinBtn.enable();
   }

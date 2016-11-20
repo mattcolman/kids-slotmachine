@@ -12,6 +12,9 @@ const MANIFEST = {
     'select',
     'success',
     'stop',
+    'pig',
+    'cow',
+    'chic',
   ],
   animations: [
     'assets',
